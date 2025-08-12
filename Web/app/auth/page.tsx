@@ -1,19 +1,14 @@
 // Web/app/auth/page.tsx
 "use client";
 
-import { createClient } from "@supabase/supabase-js";
+import { supabaseBrowser } from "../lib/supabase";
 
 export default function AuthPage() {
   const go = async () => {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-
     // Where Google should send the user back after login
     const base = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
 
-    await supabase.auth.signInWithOAuth({
+    await supabaseBrowser.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${base}/auth/callback` },
     });

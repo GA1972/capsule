@@ -1,16 +1,11 @@
 "use client";
 
-import { createClient } from "@supabase/supabase-js";
+import { supabaseBrowser } from "./lib/supabase";
 
 export default function AuthPage() {
   const go = async () => {
-    const s = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
-
     const base = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
-    await s.auth.signInWithOAuth({
+    await supabaseBrowser.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${base}/auth/callback` },
     });
