@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseBrowser } from "../../lib/supabase";
 import { useRouter } from "next/navigation";
 
 export default function CallbackPage() {
@@ -10,18 +10,18 @@ export default function CallbackPage() {
 
   useEffect(() => {
     const run = async () => {
-      const supabase = createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-      );
-
-      // Complete the OAuth flow and save the session in the browser
-      const { error } = await supabase.auth.getSessionFromUrl({ storeSession: true });
+      // Complete the OAuth flow - modern Supabase handles this automatically
+      const { data, error } = await supabaseBrowser.auth.getSession();
       if (error) {
         setErr(error.message);
         return;
       }
-      router.replace("/"); // go home
+      
+      if (data.session) {
+        router.replace("/"); // go home
+      } else {
+        setErr("No session found after OAuth callback");
+      }
     };
     run();
   }, [router]);

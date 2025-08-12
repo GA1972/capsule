@@ -1,21 +1,15 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseServer } from "../../../Web/app/lib/supabase";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const q = (url.searchParams.get("q") || "").trim();
   if (!q) return NextResponse.json({ results: [] });
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } }
-  );
-
   const [meetings, transcripts, actions] = await Promise.all([
-    supabase.from("meetings").select("id, title, created_at").textSearch("search_tsv", q, { type: "plain" }).order("created_at", { ascending: false }).limit(10),
-    supabase.from("transcripts").select("meeting_id, content, created_at").textSearch("search_tsv", q, { type: "plain" }).order("created_at", { ascending: false }).limit(10),
-    supabase.from("actions").select("meeting_id, text, owner, created_at").textSearch("search_tsv", q, { type: "plain" }).order("created_at", { ascending: false }).limit(10)
+    supabaseServer.from("meetings").select("id, title, created_at").textSearch("search_tsv", q, { type: "plain" }).order("created_at", { ascending: false }).limit(10),
+    supabaseServer.from("transcripts").select("meeting_id, content, created_at").textSearch("search_tsv", q, { type: "plain" }).order("created_at", { ascending: false }).limit(10),
+    supabaseServer.from("actions").select("meeting_id, text, owner, created_at").textSearch("search_tsv", q, { type: "plain" }).order("created_at", { ascending: false }).limit(10)
   ]);
 
   const results = [
